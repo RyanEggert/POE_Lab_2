@@ -62,6 +62,7 @@ void setup()
       Serial.println(IncomingMessage);
       lcd.clear();
       lcd.print(IncomingMessage);
+
       delay(10000);
       lcd.clear();
       lcd.print("Temperature "); 
@@ -70,7 +71,7 @@ void setup()
     else{
       IncomingMessage += recieved;
     }
-    
+
 
 
   }
