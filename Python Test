@@ -1,0 +1,5 @@
+CustomMessage='Hello!'
+
+CustomMessageFin=CustomMessage + chr(003)
+
+print CustomMessageFin
