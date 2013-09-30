@@ -1,5 +1,14 @@
-CustomMessage='Hello!'
 
-CustomMessageFin=CustomMessage + chr(003)
-
-print CustomMessageFin
+String='A really very much longer message'
+print String
+MessageLength=len(String)
+if len(String)>32:
+	String='Too long.'
+if len(String)>16:
+	cutoff=String.rfind(' ',0,16)
+	FirstLine=String[0:cutoff]
+	SecondLine=String[cutoff+1:MessageLength]
+	print FirstLine
+	print SecondLine
+if len(String)<=16:
+	print String
