@@ -1,5 +1,4 @@
 // WorkingScriptYes.ino
-// Screen1.ino
 
 // include the library code:
 #include <LiquidCrystal.h>
@@ -46,6 +45,7 @@ int  StartRefresh=0;
 int RefreshTime=1000;
 
 int TempMode=1;
+
 void setup() 
 {
   pinMode (buttonPin, INPUT);
