@@ -4,7 +4,7 @@ import time	  #Import time module
 begin=2000	
 CustomMessage= 'It works! :D'
 
-s=serial.Serial('COM3',9600) #Opening the serial port resets the Arduino. This waits for the Arduino to print 'Ready' to indicate that it has started and is prepared to send/recieve data.
+s=serial.Serial('COM4',9600) #Opening the serial port resets the Arduino. This waits for the Arduino to print 'Ready' to indicate that it has started and is prepared to send/recieve data.
 
 print 'Port Opened'
 	

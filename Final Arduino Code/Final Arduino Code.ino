@@ -6,9 +6,7 @@
 
 
 // initialize the library with the numbers of the interface pins
-LiquidCrystal lcd(7, 8, 9, 10, 11, 12);
-
-
+LiquidCrystal lcd(7, 8,12, 11, 10, 9);
 
 // you can change the overall brightness by range 0 -> 255
 int brightness = 255;
@@ -33,7 +31,7 @@ long tempF1 =0;
 long tempF2 = 0;
 long reading = 0;
 
-int buttonPin = 13;
+int buttonPin = 2;   //Pin 13
 int buttonState = LOW;
 int lastButtonState = HIGH;
 int i = 0;
@@ -45,6 +43,51 @@ int  StartRefresh=0;
 int RefreshTime=1000;
 
 int TempMode=1;
+
+byte box1 [8] = {
+  B00000,
+  B00000,
+  B00000,
+  B00000,
+  B00011,
+  B00100,
+  B00000,
+  B00000,
+};
+
+byte box2 [8] = {
+  B01110,
+  B01110,
+  B01110,
+  B00100,
+  B11111,
+  B01110,
+  B01110,
+  B01110,
+};
+
+byte box3 [8] = {
+  B00000,
+  B00000,
+  B00100,
+  B01000,
+  B10000,
+  B00000,
+  B00000,
+  B00000,
+};
+
+byte box4 [8] = {
+  B01110,
+  B01010,
+  B01010,
+  B01010,
+  B01010,
+  B11011,
+  B00000,
+  B00000,
+};
+
 
 void setup() 
 {
@@ -61,6 +104,11 @@ void setup()
     pinMode(blGrn, OUTPUT);
     pinMode(blBlu, OUTPUT);
 
+    lcd.createChar (1, box1);
+    lcd.createChar (2, box2);
+    lcd.createChar (3, box3);    
+    lcd.createChar (4, box4);
+    lcd.setCursor(0,0);
     lcd.print("Temperature: ");
 
     brightness = 255;
@@ -77,7 +125,6 @@ void setup()
   {
 
     long tempReading = analogRead (tempPin);
-    Serial.println(tempReading);
     long voltage = (tempReading*3300)/1023;
 
     int reading = digitalRead (buttonPin);
@@ -111,10 +158,12 @@ void setup()
     lcd.print(tempC2); 
     lcd.print (char (223)); 
     lcd.println ("C          ");
+    Serial.print(tempC1); Serial.print(".");Serial.print(tempC2);Serial.println("C");
     g=map(tempC1,20,30,0,255);
     b=map(tempC1,20,30,255,0);
     r=0;
     setBacklight(r,g,b);
+    ShowCustomChar();
     TempMode++ ;
   }
   else
@@ -130,31 +179,35 @@ if( i%2 !=0)
      // now convert to Fahrenheit
      tempF1 = (((((voltage-500)/10)*9)/5)+32);
      tempF2 = (((((voltage-500)%10)*9)%5)+32);
-    //tempF2 = (((tempC1 * 9 )/ 5) + 32);
+     lcd.setCursor(0,1);
+     lcd.print(tempF1);
+     lcd.print ("."); 
+     lcd.print(tempF2); 
+     lcd.print (char (223)); 
+     lcd.println ("F         "); 
+     Serial.print(tempF1); Serial.print(".");Serial.print(tempF2);Serial.println("F");
+     g=map(tempC1,65,80,0,255);
+     b=map(tempC1,65,80,255,0);
+     r=0;
+     setBacklight(r,g,b);
+     ShowCustomChar();
+     TempMode++;
+   }
+   else
+   {
 
-    lcd.setCursor(0,1);
-    lcd.print(tempF1);
-    lcd.print ("."); 
-    lcd.print(tempF2); 
-    lcd.print (char (223)); 
-    lcd.println ("F         "); 
-    TempMode++;
-  }
-  else
-  {
-
-  }
-}
+   }
+ }
 
 
 
 
 
 
-lastButtonState = reading;
+ lastButtonState = reading;
 
-if ( Serial.available() > 0)
-{
+ if ( Serial.available() > 0)
+ {
   while(Serial.available() >0)
   {
    char recieved=Serial.read();
@@ -173,27 +226,20 @@ if ( Serial.available() > 0)
     else{
       IncomingMessage += recieved;
     }
-
-
-
   }
 }
-
-// lcd.setCursor(12,0);
-// lcd.print(Temp);
-// lcd.print(char(223));
-
-// 	// if (tempmode==0)
-// 	// {
-// 	// 	lcd.print("F");
-// 	// }
-//   lcd.setCursor(0,1);
-
-//   lcd.print(Temp1);
-
-
 }
 
+void ShowCustomChar()
+{
+
+  lcd.setCursor(13,0); //Set cursor to print boxes 1-3 on the first line
+  lcd.write (1); //Print box 1
+  lcd.write (2); //Print box 2
+  lcd.write (3); //Print box 3
+  lcd.setCursor (14,1); //Set cursor to print box four on the bottom line below box 2
+  lcd.write (4); //Print box 4
+}
 
 
 void setBacklight(uint8_t r, uint8_t g, uint8_t b) {
