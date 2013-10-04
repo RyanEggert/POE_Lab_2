@@ -23,11 +23,3 @@ for x in xrange(1,10):
 	
 s.close()
 print 'Done'
-
-
-# while True:
-# 	print s\.readline()
-
-
-
-
