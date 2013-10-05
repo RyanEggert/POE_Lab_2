@@ -19,9 +19,9 @@ time.sleep(10)	#Wait for ten seconds--the amount of time the Arduino displays th
 
 x=time.clock()
 while x<10:
-	TemperatureDisp=s.readline()
-	print TemperatureDisp
-	x=time.clock()
+	TemperatureDisp=s.readline() #reads temperature printed to the serial port when the button near the display is pressed.
+	print TemperatureDisp #Displays the temperature.
+	x=time.clock() #Checks the time since temperature display began. If its been more than 30 seconds, it stops collecting data.
 	
-s.close()
-print 'Done'
+s.close() #After data collection, the serial port is closed.
+print 'Done' #"Done" is printed to verify a successful ending of the program.

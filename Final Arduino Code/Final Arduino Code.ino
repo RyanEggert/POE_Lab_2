@@ -115,89 +115,82 @@ void setup()
   void loop() 
   {
 
-    long tempReading = analogRead (tempPin);
-    long voltage = (tempReading*3300)/1023;
+    long tempReading = analogRead (tempPin); //Read temperature from sensor
+    long voltage = (tempReading*3300)/1023;  //Convert to voltage (in mV)
 
-    int reading = digitalRead (buttonPin);
-    if (reading != lastButtonState) {
-      lastDebounceTime = millis ();
-    }
-    if ((millis () - lastDebounceTime > debounceDelay )) 
+    //Debounce Button
+    int reading = digitalRead (buttonPin); 
+
+    if (reading != lastButtonState)//Looking for a change in the button's state
     {
-      if (reading != buttonState) {
-        buttonState = reading;
+      lastDebounceTime = millis (); //Saves the time at which the state changed
+    }
+    if ((millis () - lastDebounceTime > debounceDelay )) //Check whether its been debounceDelay milliseconds since the button's state initially changed
+    {
+      if (reading != buttonState) //Check whether the button is currently the opposite of what it began as
+      {
+        buttonState = reading; //
 
       // only toggle the LED if the new button state is HIGH
-      if (buttonState == HIGH) {
-        i++;
-        TempRunOnce=1;
-        lcd.setCursor(0,0);
-        lcd.print("Temperature: ");
+        if (buttonState == HIGH) 
+        {
+          i++; //increments i, used to select between C and F
+          TempRunOnce=1; //Sets TempRunOnce=0; this displays the temp once per button press to prevent screen flicker
+          lcd.setCursor(0,0); //Sets LCD cursor at the origin
+          lcd.print("Temperature: "); //Prints temperature text label
+        }
       }
     }
 
-  }
+     lastButtonState = reading;
 
-  if (( i % 2)== 0) {
-    if(TempRunOnce==1)
+    if (( i % 2)== 0) 
     {
+      if(TempRunOnce==1)
+      {
         // now print out the temperature
-    tempC1 = ((voltage - 500)/10);//converting from 10 mv per degree wit 500 mV offset
-    //to degrees ((voltage - 500mV) times 100)
-    tempC2 =((voltage - 500)%10) ;                                     
-    lcd.setCursor(0,1);
-    lcd.print(tempC1);
-    lcd.print ("."); 
-    lcd.print(tempC2); 
-    lcd.print (char (223)); 
-    lcd.println ("C          ");
-    Serial.print(tempC1); Serial.print(".");Serial.print(tempC2);Serial.println("C");
-    g=map(tempC1,20,30,0,255);
-    b=map(tempC1,20,30,255,0);
-    r=0;
-    setBacklight(r,g,b);
-    ShowCustomChar();
-    TempRunOnce++ ;
-  }
-  else
-  {
-
-  }
-
-}
-if( i%2 !=0) 
-{
-  if (TempRunOnce==1)
-  {
-     // now convert to Fahrenheit
-     tempF1 = (((((voltage-500)/10)*9)/5)+32);
-     tempF2 = (((((voltage-500)%10)*9)%5)+32);
-     lcd.setCursor(0,1);
-     lcd.print(tempF1);
-     lcd.print ("."); 
-     lcd.print(tempF2); 
-     lcd.print (char (223)); 
-     lcd.println ("F         "); 
-     Serial.print(tempF1); Serial.print(".");Serial.print(tempF2);Serial.println("F");
-     g=map(tempC1,65,80,0,255);
-     b=map(tempC1,65,80,255,0);
-     r=0;
-     setBacklight(r,g,b);
-     ShowCustomChar();
-     TempRunOnce++;
-   }
-   else
-   {
-
-   }
- }
+        tempC1 = ((voltage - 500)/10);//converting from 10 mv per degree wit 500 mV offset
+        //to degrees ((voltage - 500mV) times 100)
+        tempC2 =((voltage - 500)%10) ;                                     
+        lcd.setCursor(0,1);
+        lcd.print(tempC1);
+        lcd.print ("."); 
+        lcd.print(tempC2); 
+        lcd.print (char (223)); 
+        lcd.println ("C          ");
+        Serial.print(tempC1); Serial.print(".");Serial.print(tempC2);Serial.println("C");
+        g=map(tempC1,20,30,0,255);
+        b=map(tempC1,20,30,255,0);
+        r=0;
+        setBacklight(r,g,b);
+        ShowCustomChar();
+        TempRunOnce++ ;
+      }
+    }
+    if( i%2 !=0) 
+    {
+      if (TempRunOnce==1)
+      {
+         // now convert to Fahrenheit
+         tempF1 = (((((voltage-500)/10)*9)/5)+32);
+         tempF2 = (((((voltage-500)%10)*9)%5)+32);
+         lcd.setCursor(0,1);
+         lcd.print(tempF1);
+         lcd.print ("."); 
+         lcd.print(tempF2); 
+         lcd.print (char (223)); 
+         lcd.println ("F         "); 
+         Serial.print(tempF1); Serial.print(".");Serial.print(tempF2);Serial.println("F");
+         g=map(tempC1,65,80,0,255);
+         b=map(tempC1,65,80,255,0);
+         r=0;
+         setBacklight(r,g,b);
+         ShowCustomChar();
+         TempRunOnce++;
+       }
+     }
 
 
-
-
-
-
- lastButtonState = reading;
 
  if ( Serial.available() > 0)
  {
