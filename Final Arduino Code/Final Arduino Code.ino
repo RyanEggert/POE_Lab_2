@@ -1,49 +1,43 @@
-// WorkingScriptYes.ino
+// FinalArduinoCode.ino
 
-// include the library code:
 #include <LiquidCrystal.h>
-// #include <Wire.h>
+
 
 
 // initialize the library with the numbers of the interface pins
-LiquidCrystal lcd(7, 8,12, 11, 10, 9);
+LiquidCrystal lcd(7,8,9,10,11,12);
 
-// you can change the overall brightness by range 0 -> 255
+//change the overall brightness by range 0 -> 255
 int brightness = 255;
 
 int blRed=3;  //Red backlight pin
 int blGrn=5;  //Green backlight pin
 int blBlu=6;  //Blue backlight pin
 
-// int TempPin=A0; //The pin into which the temp sensor output is plugged
-// int Temp1=0;   //Temperature reading directly from sensor
+int r=1; //Used to set 0-255 value for backlight red LED
+int g=1; //Used to set 0-255 value for backlight green LED
+int b=1; //Used to set 0-255 value for backlight blue LED
 
-int r=1;
-int g=1;
-int b=1;
-
-String IncomingMessage;
+String IncomingMessage; //Used to store the 
 
 const int tempPin = A0;  //For temperature reading and modes
-long tempC1 = 0;
-long tempC2 = 0;
-long tempF1 =0;
-long tempF2 = 0;
-long reading = 0;
+long tempC1 = 0; //Tens and ones place of Celsius temperature
+long tempC2 = 0; //Decimal of Celsius temperature
+long tempF1 = 0;//Tens and ones place of Celsius temperature
+long tempF2 = 0;//Decimal of Celsius temperature
+long reading = 0; //Used for reading the pushbutton state
 
-int buttonPin = 2;   //Pin 13
-int buttonState = LOW;
-int lastButtonState = HIGH;
-int i = 0;
+int buttonPin = 13;   //Pushbutton Pin
+int buttonState = LOW;//Pushbutton state variable
+int lastButtonState = HIGH; //Pushbutton memory state
+int i = 0; //Used to determine whether to display C or F
 
-long lastDebounceTime = 0;
-long debounceDelay = 40;
+long lastDebounceTime = 0; //Used for debouncing
+long debounceDelay = 40; //Debounce delay in milliseconds
 
-int  StartRefresh=0;
-int RefreshTime=1000;
+int TempRunOnce=1; //Used to prevent rapid refreshing and flickering of the screen
 
-int TempMode=1;
-
+//Custom Character setup
 byte box1 [8] = {
   B00000,
   B00000,
@@ -52,7 +46,7 @@ byte box1 [8] = {
   B00011,
   B00100,
   B00000,
-  B00000,
+  B00000
 };
 
 byte box2 [8] = {
@@ -63,7 +57,7 @@ byte box2 [8] = {
   B11111,
   B01110,
   B01110,
-  B01110,
+  B01110
 };
 
 byte box3 [8] = {
@@ -74,7 +68,7 @@ byte box3 [8] = {
   B10000,
   B00000,
   B00000,
-  B00000,
+  B00000
 };
 
 byte box4 [8] = {
@@ -85,17 +79,17 @@ byte box4 [8] = {
   B01010,
   B11011,
   B00000,
-  B00000,
+  B00000
 };
 
 
 void setup() 
 {
-  pinMode (buttonPin, INPUT);
+  pinMode (buttonPin, INPUT); 
   pinMode(tempPin,INPUT);
  	analogReference(EXTERNAL);  //Use 3.3 volt supply as AREF
 
-  // Set up the LCD's number of rows and columns: 
+  // Set up the LCD's number of rows and columns and clear it.
   lcd.begin(16, 2);
   lcd.clear();
 
@@ -104,20 +98,17 @@ void setup()
     pinMode(blGrn, OUTPUT);
     pinMode(blBlu, OUTPUT);
 
-    lcd.createChar (1, box1);
+    lcd.createChar (1, box1); //create custom characters
     lcd.createChar (2, box2);
     lcd.createChar (3, box3);    
     lcd.createChar (4, box4);
-    lcd.setCursor(0,0);
-    lcd.print("Temperature: ");
 
-    brightness = 255;
-    Serial.begin(9600);
-    Serial.println("1050");
-    r=0;
-    b=0;
-    g=255;
-    setBacklight(r,g,b);
+    lcd.setCursor(0,0);       //Sets cursor at the origin
+    lcd.print("Temperature: "); //Prints "Temperature :" label to first line
+
+    brightness = 255; //Sets screen to maximum brightness
+    Serial.begin(9600); //Start the serial port
+    Serial.println("1050"); //The Arduino prints to the serial port to indicate that it has loaded and is ready to recieve information. Used to alert Python code that Arduino has loaded after Pyserial forces an Arduino restart.
   }
 
 
@@ -139,14 +130,16 @@ void setup()
       // only toggle the LED if the new button state is HIGH
       if (buttonState == HIGH) {
         i++;
-        TempMode=1;
+        TempRunOnce=1;
+        lcd.setCursor(0,0);
+        lcd.print("Temperature: ");
       }
     }
 
   }
 
   if (( i % 2)== 0) {
-    if(TempMode==1)
+    if(TempRunOnce==1)
     {
         // now print out the temperature
     tempC1 = ((voltage - 500)/10);//converting from 10 mv per degree wit 500 mV offset
@@ -164,7 +157,7 @@ void setup()
     r=0;
     setBacklight(r,g,b);
     ShowCustomChar();
-    TempMode++ ;
+    TempRunOnce++ ;
   }
   else
   {
@@ -174,7 +167,7 @@ void setup()
 }
 if( i%2 !=0) 
 {
-  if (TempMode==1)
+  if (TempRunOnce==1)
   {
      // now convert to Fahrenheit
      tempF1 = (((((voltage-500)/10)*9)/5)+32);
@@ -191,7 +184,7 @@ if( i%2 !=0)
      r=0;
      setBacklight(r,g,b);
      ShowCustomChar();
-     TempMode++;
+     TempRunOnce++;
    }
    else
    {
@@ -213,14 +206,13 @@ if( i%2 !=0)
    char recieved=Serial.read();
    if (recieved==char(003))
    {
-    Serial.println("Message Received");
-    Serial.println(IncomingMessage);
     lcd.clear();
     lcd.print(IncomingMessage);
-
     delay(10000);
     lcd.clear();
-    lcd.print("Temperature: "); 
+    lcd.print("Press button to"); 
+    lcd.setCursor(0,1);
+    lcd.print("continue.");
       IncomingMessage="";   //Clear String for next message
     }
     else{

@@ -12,14 +12,16 @@ while begin == 2000 :
 		begin=s.readline() #Waits to see that the Arduino has outputted a value to the serial port. This indicates that the Arduino has reset and is ready to recieve data
 print 'Ready to go'
 CustomMessageFin=CustomMessage + chr(003)
-print CustomMessageFin
+print "Custom Message Sent:" + CustomMessageFin
 
 s.write(CustomMessageFin)
 time.sleep(10)	#Wait for ten seconds--the amount of time the Arduino displays the custom message
-for x in xrange(1,10):
-	TemperatureDisp=s.readline()
-	print TemperatureDisp	
 
+x=time.clock()
+while x<10:
+	TemperatureDisp=s.readline()
+	print TemperatureDisp
+	x=time.clock()
 	
 s.close()
 print 'Done'
