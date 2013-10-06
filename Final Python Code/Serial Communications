@@ -1,27 +1,29 @@
+##SerialCommunications.py
+
 import serial #Import PySerial module
 import time	  #Import time module
 
-begin=2000	
-CustomMessage= 'It works! :D'
+begin=2000	#Initialize variable used for confirming Arduino readiness
+CustomMessage= 'It works! :D' #The message that will be sent to the Arduino and displayed on the LCD.
 
 s=serial.Serial('COM4',9600) #Opening the serial port resets the Arduino. This waits for the Arduino to print 'Ready' to indicate that it has started and is prepared to send/recieve data.
 
-print 'Port Opened'
+print 'Port Opened'#Print confirmation that Pyserial has opened the serial port
 	
 while begin == 2000 :	
 		begin=s.readline() #Waits to see that the Arduino has outputted a value to the serial port. This indicates that the Arduino has reset and is ready to recieve data
-print 'Ready to go'
-CustomMessageFin=CustomMessage + chr(003)
-print "Custom Message Sent:" + CustomMessageFin
+print 'Ready' #Print confirmation that the Arduino is ready to recieve data
+CustomMessageFin=CustomMessage + chr(003) #Append  character to the end of the message
 
-s.write(CustomMessageFin)
+s.write(CustomMessageFin) #Write the new message to the serial port
+print "Custom Message Sent:" + CustomMessageFin #Print confirmation of sent message
 time.sleep(10)	#Wait for ten seconds--the amount of time the Arduino displays the custom message
 
-x=time.clock()
+x=time.clock() #Start a "stopwatch". Calls to time.clock() will reference this time
 while x<10:
 	TemperatureDisp=s.readline() #reads temperature printed to the serial port when the button near the display is pressed.
 	print TemperatureDisp #Displays the temperature.
-	x=time.clock() #Checks the time since temperature display began. If its been more than 30 seconds, it stops collecting data.
+	x=time.clock() #Checks the time since temperature display began. If its been more than 10 seconds, it stops collecting data.
 	
 s.close() #After data collection, the serial port is closed.
 print 'Done' #"Done" is printed to verify a successful ending of the program.

@@ -1,41 +1,32 @@
-// FinalArduinoCode.ino
+// LCD_Control.ino
 
 #include <LiquidCrystal.h>
-
-
-
-// initialize the library with the numbers of the interface pins
-LiquidCrystal lcd(7,8,9,10,11,12);
-
-//change the overall brightness by range 0 -> 255
-int brightness = 255;
-
+LiquidCrystal lcd(7,8,9,10,11,12); //Initialize LCD. Give data pin locations
+int brightness = 255; //Enables changing the overall backlight brightness
 int blRed=3;  //Red backlight pin
 int blGrn=5;  //Green backlight pin
 int blBlu=6;  //Blue backlight pin
-
 int r=1; //Used to set 0-255 value for backlight red LED
 int g=1; //Used to set 0-255 value for backlight green LED
 int b=1; //Used to set 0-255 value for backlight blue LED
-
-String IncomingMessage; //Used to store the 
 
 const int tempPin = A0;  //For temperature reading and modes
 long tempC1 = 0; //Tens and ones place of Celsius temperature
 long tempC2 = 0; //Decimal of Celsius temperature
 long tempF1 = 0;//Tens and ones place of Celsius temperature
 long tempF2 = 0;//Decimal of Celsius temperature
-long reading = 0; //Used for reading the pushbutton state
+int i = 0; //Used to determine whether to display C or F
+int TempRunOnce=1; //Used to prevent rapid refreshing and flickering of the screen
 
 int buttonPin = 13;   //Pushbutton Pin
+long reading = 0; //Used for reading the pushbutton state
 int buttonState = LOW;//Pushbutton state variable
 int lastButtonState = HIGH; //Pushbutton memory state
-int i = 0; //Used to determine whether to display C or F
 
 long lastDebounceTime = 0; //Used for debouncing
 long debounceDelay = 40; //Debounce delay in milliseconds
 
-int TempRunOnce=1; //Used to prevent rapid refreshing and flickering of the screen
+String IncomingMessage; //Used to store the incoming serial message from a PC.
 
 //Custom Character setup
 byte box1 [8] = {
@@ -185,29 +176,29 @@ void loop()
      ShowCustomChar();
      TempRunOnce++;
    }
- }
-    if ( Serial.available() > 0) //Checks for incoming data from the serial port
+  }
+  if ( Serial.available() > 0) //Checks for incoming data from the serial port
+  {
+    while(Serial.available() >0) //Loops as long as there is incoming data
     {
-      while(Serial.available() >0) //Loops as long as there is incoming data
-      {
-       char recieved=Serial.read(); //Stores the recieved character
-       
-       if (recieved==char(003)) //Check to see whether  character has been recieved. Python appends this to the end of each custom message it sends.
-       {
-        lcd.clear(); //Clear the LCD
-        lcd.print(IncomingMessage); //Print everything recieved to the serial port, excluding the  character to the LCD
-        delay(10000); //Display the message for 10 seconds
-        lcd.clear(); //Clear the message from the screen
-        lcd.print("Press button to"); //Prompt the user to press the button to 
-        lcd.setCursor(0,1);           //resume temperature display
-        lcd.print("continue.");
-          IncomingMessage="";   //Clear IncomingMessage string for next message
-        }
-        else{
-          IncomingMessage += recieved; //if the message isn't over yet, append the latest recieved character to a string
-        }
+     char recieved=Serial.read(); //Stores the recieved character
+     
+     if (recieved==char(003)) //Check to see whether  character has been recieved. Python appends this to the end of each custom message it sends.
+     {
+      lcd.clear(); //Clear the LCD
+      lcd.print(IncomingMessage); //Print everything recieved to the serial port, excluding the  character to the LCD
+      delay(10000); //Display the message for 10 seconds
+      lcd.clear(); //Clear the message from the screen
+      lcd.print("Press button to"); //Prompt the user to press the button to 
+      lcd.setCursor(0,1);           //resume temperature display
+      lcd.print("continue.");
+        IncomingMessage="";   //Clear IncomingMessage string for next message
+      }
+      else{
+        IncomingMessage += recieved; //if the message isn't over yet, append the latest recieved character to a string
       }
     }
+  }
 }
 
 void ShowCustomChar() //A function which will print four custom characters in their appropriate places at the far right side of the LCD.
@@ -222,19 +213,22 @@ void ShowCustomChar() //A function which will print four custom characters in th
 
 
 void setBacklight(uint8_t r, uint8_t g, uint8_t b) {
-  // normalize the red LED - its brighter than the rest!
+  //Normalize the red LED--its brighter than the rest.
   r = map(r, 0, 255, 0, 100);
   g = map(g, 0, 255, 0, 150);
 
+  //Map rgb values to reflect brightness variable.
   r = map(r, 0, 255, 0, brightness);
   g = map(g, 0, 255, 0, brightness);
   b = map(b, 0, 255, 0, brightness);
 
-  // common anode so invert!
+  //Common anode so invert!
   r = map(r, 0, 255, 255, 0);
   g = map(g, 0, 255, 255, 0);
-  b = map(b, 0, 255, 255, 0);
-  analogWrite(blRed, r);
+  b = map(b, 0, 255, 255, 0);\
+
+  //Set backlight LEDs to mapped values
+  analogWrite(blRed, r); 
   analogWrite(blGrn, g);
   analogWrite(blBlu, b);
 }
