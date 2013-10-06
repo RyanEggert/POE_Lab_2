@@ -142,13 +142,12 @@ void setup()
       }
     }
 
-     lastButtonState = reading;
+     lastButtonState = reading; //Stores the latest reading from the button
 
-    if (( i % 2)== 0) 
+    if (( i % 2)== 0) //checks whether i is an even number
     {
-      if(TempRunOnce==1)
+      if(TempRunOnce==1) //checks whether this is the first time through this if-statement since the button has been pressed
       {
-        // now print out the temperature
         tempC1 = ((voltage - 500)/10);//converting from 10 mv per degree wit 500 mV offset
         //to degrees ((voltage - 500mV) times 100)
         tempC2 =((voltage - 500)%10) ;                                     
@@ -159,15 +158,15 @@ void setup()
         lcd.print (char (223)); 
         lcd.println ("C          ");
         Serial.print(tempC1); Serial.print(".");Serial.print(tempC2);Serial.println("C");
-        g=map(tempC1,20,30,0,255);
-        b=map(tempC1,20,30,255,0);
+        g=map(tempC1,20,30,0,255); //map green backlight LED to display 0 when temp is 20C, 255 when temp is 
+        b=map(tempC1,20,30,255,0); //map green backlight LED to display 0 when temp is 20C, 255 when temp is  
         r=0;
-        setBacklight(r,g,b);
+        setBacklight(r,g,b);//Use the setBacklight function to change backlight
         ShowCustomChar();
         TempRunOnce++ ;
       }
     }
-    if( i%2 !=0) 
+    if( i%2 !=0) //checks whether i is an odd number
     {
       if (TempRunOnce==1)
       {
@@ -178,7 +177,7 @@ void setup()
          lcd.print(tempF1);
          lcd.print ("."); 
          lcd.print(tempF2); 
-         lcd.print (char (223)); 
+         lcd.print (char (223)); //Print the degree sign to the LCD
          lcd.println ("F         "); 
          Serial.print(tempF1); Serial.print(".");Serial.print(tempF2);Serial.println("F");
          g=map(tempC1,65,80,0,255);
@@ -192,11 +191,12 @@ void setup()
 
 
 
- if ( Serial.available() > 0)
+ if ( Serial.available() > 0) //checks for incoming data from the serial port
  {
-  while(Serial.available() >0)
+  while(Serial.available() >0) //loops as long as there is incoming data
   {
-   char recieved=Serial.read();
+   char recieved=Serial.read(); //stores the recieved character
+   
    if (recieved==char(003))
    {
     lcd.clear();
